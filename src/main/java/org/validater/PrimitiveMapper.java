@@ -3,6 +3,13 @@ package org.validater;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Utility class for mapping primitive types to their Wrapper Class.
+ * Necessary for e.g. casting float to double when the validation type is
+ * double but the field is float.
+ *
+ */
+
 class PrimitiveMapper {
 
     private static final Map<Class<?>, Class<?>> primitiveToWrapper;

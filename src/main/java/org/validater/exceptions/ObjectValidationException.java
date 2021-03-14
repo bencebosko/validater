@@ -2,6 +2,10 @@ package org.validater.exceptions;
 
 import org.validater.Validator;
 
+/**
+ * Thrown when the object type not matches the validator type.
+ */
+
 public class ObjectValidationException extends ValidationException{
 
     private final Object obj;

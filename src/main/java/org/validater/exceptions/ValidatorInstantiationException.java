@@ -1,5 +1,9 @@
 package org.validater.exceptions;
 
+/**
+ * Thrown when a validator has no default or public nullary constructor.
+ */
+
 public class ValidatorInstantiationException extends ValidationException {
 
     private final Class<?> validatorType;

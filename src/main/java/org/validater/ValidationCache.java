@@ -3,6 +3,10 @@ package org.validater;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Caches validations once an object of a given type is scanned.
+ * */
+
 class ValidationCache {
 
     private final Map<Class<?>, List<FieldValidation>> fieldValidations = new ConcurrentHashMap<>();

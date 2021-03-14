@@ -12,19 +12,9 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 /**
- * A thread-safe Validation framework for validating java objects. Validations can be added to the fields
- * of an object with any type, or we can add validators to a specified type of object. Although the lib
- * contains some built-in field validations, more specific validations must be implemented by implementing
- * the FieldValidator or Validator interface, and mapping the annotation labels to these implementations.
- *
- * Validations mapped to FieldValidator validates single fields of objects of any type, while Objects
- * mapped to their corresponding Validator validate the whole object at once.
- *
- * Field validations are cached for each type of object, so objects are only scanned for the first time
- * when their type is unknown. Some condition checks are also can be saved this way, so the validations run pretty fast.
- *
- * The validator implementations can be loaded lazily while scanning annotations or eagerly from spring's
- * ApplicationContext.
+ * Main class which runs all type of validations.
+ * The annotated objects must be passed to the 'validate' method and the 'ValidationResult' is returned.
+ * Caching can be turned on and off by setting 'cache' true or false.
  *
  */
 

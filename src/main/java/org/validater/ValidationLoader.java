@@ -6,6 +6,10 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The class which loads and stores validator instances.
+ * */
+
 class ValidationLoader {
 
     private static volatile ValidationLoader singleInstance;

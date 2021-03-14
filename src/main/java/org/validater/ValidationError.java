@@ -1,5 +1,9 @@
 package org.validater;
 
+/**
+ * Class representing a ValidationError of a field.
+ * */
+
 public class ValidationError {
 
     private final String message;

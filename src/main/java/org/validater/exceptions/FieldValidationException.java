@@ -2,6 +2,10 @@ package org.validater.exceptions;
 
 import java.lang.reflect.Field;
 
+/**
+ * Thrown when the field type not matches the validation type.
+ */
+
 public class FieldValidationException extends ValidationException{
 
     private final Object obj;

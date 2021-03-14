@@ -5,6 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents the result of the validation. Error messages per field can be
+ * accessed by their field name.
+ *
+ * */
+
 public class ValidationResult {
 
     private final Map<String, List<ValidationError>> errors;
