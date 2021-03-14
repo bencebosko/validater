@@ -41,16 +41,21 @@ public class ValidationRunner {
     }
 
     public ValidationResult validate(Object obj) {
-        if(validationCache.isCached(obj.getClass()))
+        Class<?> objType = obj.getClass();
+        if(validationCache.isCached(objType))
             return validationCache.validate(obj);
 
         Optional<ValidatedBy> validation =
-                Optional.ofNullable(obj.getClass().getAnnotation(ValidatedBy.class));
+                Optional.ofNullable(objType.getAnnotation(ValidatedBy.class));
         if(validation.isPresent()) {
-                Validator<Object> validator = validationLoader.getValidator(validation.get().validator());
-                return validateObject(obj, validator);
+            Validator<Object> validator = validationLoader.getValidator(validation.get().validator());
+            return validate(obj, validator);
         } else {
-            return validateAllField(obj);
+            List<FieldValidation> cached = new ArrayList<>();
+            ValidationResult result = validateAllField(obj, cached);
+            if(!validationCache.isCached(objType))
+                validationCache.cacheForType(objType, cached);
+            return result;
         }
     }
 
@@ -67,15 +72,17 @@ public class ValidationRunner {
         }
     }
 
-    private ValidationResult validateObject(Object obj, Validator<Object> validator) {
+    private ValidationResult validate(Object obj, Validator<Object> validator) {
         if(obj.getClass() != validator.type())
             throw new ObjectValidationException(obj, validator);
+
         Map<String, List<ValidationError>> errors = new HashMap<>();
         validator.validate(obj, errors);
+
         return new ValidationResult(errors);
     }
 
-    private ValidationResult validateAllField(Object obj) {
+    private ValidationResult validateAllField(Object obj, List<FieldValidation> cached) {
         ValidationResult res = new ValidationResult();
 
         for(Field field : obj.getClass().getDeclaredFields()) {
@@ -86,17 +93,15 @@ public class ValidationRunner {
                 if(validation.isPresent()) {
                     FieldValidator<Object, Annotation> validator =
                             validationLoader.getFieldValidator(validation.get().validator());
-                    validateField(obj, field, validator, annotation, res);
+                    validateField(obj, field, validator, annotation, res, cached);
                 }
             }
         }
         return res;
     }
 
-    void validateField(Object obj, Field field,
-                               FieldValidator<Object, Annotation> validator,
-                               Annotation annotation,
-                               ValidationResult result) {
+    void validateField(Object obj, Field field, FieldValidator<Object, Annotation> validator,
+                       Annotation annotation, ValidationResult result, List<FieldValidation> cached) {
 
         Class<?> fieldType = field.getType();
         if(fieldType.isPrimitive()) {
@@ -110,7 +115,7 @@ public class ValidationRunner {
             validator.validate(field.get(obj), annotation, errors);
             if(!errors.isEmpty())
                 result.addErrorList(field.getName(), errors);
-            validationCache.addValidation(obj.getClass(), field, annotation, validator);
+            cached.add(new FieldValidation(field, annotation, validator));
 
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             ex.printStackTrace();
