@@ -17,5 +17,8 @@ public class RequiredValidator implements FieldValidator<Object, Required> {
     public void validate(@Nullable Object value, Required annotation, List<ValidationError> errors) {
         if(value == null)
             errors.add(new ValidationError(annotation.message()));
+        else if(value instanceof String && value.equals("")) {
+            errors.add(new ValidationError(annotation.message()));
+        }
     }
 }

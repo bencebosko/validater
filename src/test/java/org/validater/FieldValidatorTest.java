@@ -88,10 +88,14 @@ public class FieldValidatorTest {
 
             @Required
             String field2 = "not null";
+
+            @Required
+            String field3 = "";
         }
 
         ValidationResult expected = new ValidationResult(new HashMap<String, List<ValidationError>>() {{
             put("field1", Arrays.asList(new ValidationError("field is required")));
+            put("field3", Arrays.asList(new ValidationError("field is required")));
         }});
 
         ValidationResult result = validationRunner.validate(new TestObject());
