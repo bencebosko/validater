@@ -7,7 +7,8 @@ the `FieldValidator` or `Validator` interface.
 **Validations are cached for each type of object**, so objects are only scanned for the first time
 when their type is unknown. Some condition checks are also can be saved this way, so the validations run pretty fast.
 
-Validators **can be loaded lazily** while scanning annotations **or eagerly** from Spring's `ApplicationContext`.
+Furthermore, validations **can be loaded to the cache eagerly** by providing packages to scan. Objects from these packages will be 
+scanned at initialization.
 
 ## Examples
 ### ValidationRunner
