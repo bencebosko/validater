@@ -4,12 +4,13 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Caches validations once an object of a given type is scanned.
+ * Caches validations when an object of a given type is scanned.
  * */
 
 class ValidationCache {
 
-    private final Map<Class<?>, List<FieldValidation>> fieldValidations = new ConcurrentHashMap<>();
+    private static final int INITIAL_SIZE = 32;
+    private final Map<Class<?>, List<FieldValidation>> fieldValidations = new ConcurrentHashMap<>(INITIAL_SIZE);
 
     boolean isCached(Class<?> type) {
         return fieldValidations.containsKey(type);

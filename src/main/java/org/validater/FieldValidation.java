@@ -17,9 +17,9 @@ class FieldValidation {
 
     FieldValidation(Field field, Annotation annotation, FieldValidator<Object, Annotation> validator) {
         this.field = field;
+        this.field.setAccessible(true);
         this.annotation = annotation;
         this.validator = validator;
-        field.setAccessible(true);
     }
 
     void run(Object obj, ValidationResult res) throws IllegalArgumentException, IllegalAccessException {

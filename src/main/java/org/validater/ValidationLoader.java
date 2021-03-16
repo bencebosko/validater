@@ -3,7 +3,6 @@ package org.validater;
 import org.jetbrains.annotations.NotNull;
 import org.validater.exceptions.ValidatorInstantiationException;
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,12 +12,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 class ValidationLoader {
 
+    private static final int INITIAL_SIZE = 32;
     private final Map<Class<? extends Validator>, Validator<Object>> validators;
     private final Map<Class<? extends FieldValidator>, FieldValidator<Object, Annotation>> fieldValidators;
 
     ValidationLoader() {
-        validators = new ConcurrentHashMap<>();
-        fieldValidators = new ConcurrentHashMap<>();
+        validators = new ConcurrentHashMap<>(INITIAL_SIZE);
+        fieldValidators = new ConcurrentHashMap<>(INITIAL_SIZE);
     }
 
     @NotNull

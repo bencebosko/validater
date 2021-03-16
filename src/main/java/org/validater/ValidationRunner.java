@@ -18,7 +18,7 @@ import java.util.*;
 public class ValidationRunner {
 
     private final ValidationLoader validationLoader;
-    private ValidationCache validationCache;
+    private final ValidationCache validationCache;
 
     ValidationRunner() {
         validationLoader = new ValidationLoader();
