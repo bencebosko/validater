@@ -84,19 +84,6 @@ public class ValidationRunner {
         return validationCache;
     }
 
-    void setCache(boolean cache) {
-        if(cache) {
-            validationCache = new ValidationCache();
-        } else {
-            validationCache = new ValidationCache() {
-                @Override
-                boolean isCached(Class<?> type) {
-                    return false;
-                }
-            };
-        }
-    }
-
     private boolean isCompatible(Field field, FieldValidator<Object, Annotation> validator) {
         Class<?> fieldType = field.getType();
         if(fieldType.isPrimitive()) {

@@ -16,7 +16,6 @@ public class FieldValidatorConcurrencyTest {
 
     private static ValidationRunner validationRunner;
 
-    @Disabled
     @Test
     public void testConcurrentCache() {
         ValidationRunnerFactory factory = new ValidationRunnerFactory();
