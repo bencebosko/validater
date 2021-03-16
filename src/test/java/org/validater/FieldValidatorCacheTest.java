@@ -6,22 +6,23 @@ import org.junit.jupiter.api.Test;
 import org.validater.annotations.Max;
 import org.validater.annotations.Min;
 import org.validater.annotations.Required;
-
+import org.validater.dto.TestDto1;
+import org.validater.dto.TestDto2;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FieldValidatorCacheTest {
 
-    static ValidationRunner validationRunner;
+    private static ValidationRunner validationRunner;
 
     @BeforeAll
     public static void init() {
-        validationRunner = new ValidationRunner();
+        ValidationRunnerFactory factory = new ValidationRunnerFactory();
+        validationRunner = factory.getValidationRunner();
     }
 
     @Test
@@ -70,6 +71,18 @@ public class FieldValidatorCacheTest {
         }
     }
 
+    @Test
+    public void testEagerCache() {
+        ValidationRunnerFactory factory = new ValidationRunnerFactory();
+        factory.setPackagesToScan("org.validater.dto");
+        validationRunner = factory.getValidationRunner();
+
+        ValidationCache cache = validationRunner.getCache();
+
+        assertTrue(cache.isCached(TestDto1.class));
+        assertTrue(cache.isCached(TestDto2.class));
+    }
+
     @Disabled
     @Test
     public void testWithoutCache() {
@@ -106,7 +119,7 @@ public class FieldValidatorCacheTest {
 
         List<ValidationResult> results = new ArrayList<>();
 
-        validationRunner.cache(false);
+        validationRunner.setCache(false);
 
         for(int i=0; i<100000; i++) {
             results.add(validationRunner.validate(new TestObject()));
@@ -117,6 +130,6 @@ public class FieldValidatorCacheTest {
             assertEquals(expected, result);
         }
 
-        validationRunner.cache(true);
+        validationRunner.setCache(true);
     }
 }

@@ -8,17 +8,17 @@ import java.lang.reflect.Field;
 
 public class FieldValidationException extends ValidationException{
 
-    private final Object obj;
+    private final Class<?> cls;
     private final Field field;
 
-    public FieldValidationException(Object obj, Field field) {
-        super("Invalid type of field: [" + field.getName() + "] Class: " + obj.getClass().getSimpleName());
-        this.obj = obj;
+    public FieldValidationException(Class<?> cls, Field field) {
+        super("Invalid type of field: [" + field.getName() + "] Class: " + cls.getSimpleName());
+        this.cls = cls;
         this.field = field;
     }
 
-    public Object getObj() {
-        return obj;
+    public Class<?> getCls() {
+        return cls;
     }
 
     public Field getField() {

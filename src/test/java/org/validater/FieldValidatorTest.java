@@ -12,11 +12,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class FieldValidatorTest {
 
-    static ValidationRunner validationRunner;
+    private static ValidationRunner validationRunner;
 
     @BeforeAll
     public static void init() {
-        validationRunner = new ValidationRunner();
+
+        ValidationRunnerFactory factory = new ValidationRunnerFactory();
+        validationRunner = factory.getValidationRunner();
     }
 
     @Test

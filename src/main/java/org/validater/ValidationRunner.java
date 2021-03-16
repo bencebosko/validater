@@ -1,7 +1,5 @@
 package org.validater;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.validater.annotations.ValidatedBy;
 import org.validater.annotations.Validation;
@@ -14,19 +12,16 @@ import java.util.*;
 /**
  * Main class which runs all type of validations.
  * The annotated objects must be passed to the 'validate' method and the 'ValidationResult' is returned.
- * Caching can be turned on and off by setting 'cache' true or false.
  *
  */
 
 public class ValidationRunner {
 
-    @Autowired
-    private ApplicationContext context;
     private final ValidationLoader validationLoader;
     private ValidationCache validationCache;
 
-    public ValidationRunner() {
-        validationLoader = ValidationLoader.getInstance();
+    ValidationRunner() {
+        validationLoader = new ValidationLoader();
         validationCache = new ValidationCache();
     }
 
@@ -37,28 +32,12 @@ public class ValidationRunner {
 
         Optional<ValidatedBy> validation =
                 Optional.ofNullable(objType.getAnnotation(ValidatedBy.class));
+
         if(validation.isPresent()) {
             Validator<Object> validator = validationLoader.getValidator(validation.get().validator());
             return validate(obj, validator);
         } else {
-            List<FieldValidation> cached = new ArrayList<>();
-            ValidationResult result = validateAllField(obj, cached);
-            if(!validationCache.isCached(objType))
-                validationCache.cacheForType(objType, cached);
-            return result;
-        }
-    }
-
-    public void cache(boolean cacheOn) {
-        if(cacheOn) {
-            validationCache = new ValidationCache();
-        } else {
-            validationCache = new ValidationCache() {
-                @Override
-                boolean isCached(Class<?> type) {
-                    return false;
-                }
-            };
+            return validateAllField(obj);
         }
     }
 
@@ -72,10 +51,18 @@ public class ValidationRunner {
         return new ValidationResult(errors);
     }
 
-    private ValidationResult validateAllField(Object obj, List<FieldValidation> cached) {
-        ValidationResult res = new ValidationResult();
+    private ValidationResult validateAllField(Object obj) {
+        Class<?> cls = obj.getClass();
+        List<FieldValidation> validations = scanClassFields(cls);
+        validationCache.cacheForType(cls, validations);
+        return validationCache.validate(obj);
+    }
 
-        for(Field field : obj.getClass().getDeclaredFields()) {
+    List<FieldValidation> scanClassFields(Class<?> cls) {
+
+        List<FieldValidation> validations = new ArrayList<>();
+
+        for(Field field : cls.getDeclaredFields()) {
             for(Annotation annotation : field.getDeclaredAnnotations()) {
                 Optional<Validation> validation =
                         Optional.ofNullable(AnnotationUtils.getAnnotation(annotation, Validation.class));
@@ -83,36 +70,38 @@ public class ValidationRunner {
                 if(validation.isPresent()) {
                     FieldValidator<Object, Annotation> validator =
                             validationLoader.getFieldValidator(validation.get().validator());
-                    validateField(obj, field, validator, annotation, res, cached);
+                    if(!isCompatible(field, validator))
+                        throw new FieldValidationException(cls, field);
+                    else
+                        validations.add(new FieldValidation(field, annotation, validator));
                 }
             }
         }
-        return res;
+        return validations;
     }
 
-    void validateField(Object obj, Field field, FieldValidator<Object, Annotation> validator,
-                       Annotation annotation, ValidationResult result, List<FieldValidation> cached) {
+    ValidationCache getCache() {
+        return validationCache;
+    }
 
+    void setCache(boolean cache) {
+        if(cache) {
+            validationCache = new ValidationCache();
+        } else {
+            validationCache = new ValidationCache() {
+                @Override
+                boolean isCached(Class<?> type) {
+                    return false;
+                }
+            };
+        }
+    }
+
+    private boolean isCompatible(Field field, FieldValidator<Object, Annotation> validator) {
         Class<?> fieldType = field.getType();
         if(fieldType.isPrimitive()) {
             fieldType = PrimitiveMapper.getWrapper(fieldType);
         }
-        if(!subTypeOf(fieldType, validator.fieldType()))
-            throw new FieldValidationException(obj, field);
-        try {
-            List<ValidationError> errors = new ArrayList<>();
-            field.setAccessible(true);
-            validator.validate(field.get(obj), annotation, errors);
-            if(!errors.isEmpty())
-                result.addErrorList(field.getName(), errors);
-            cached.add(new FieldValidation(field, annotation, validator));
-
-        } catch (IllegalArgumentException | IllegalAccessException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    private boolean subTypeOf(Class<?> a, Class<?> b) {
-        return b.isAssignableFrom(a);
+        return validator.fieldType().isAssignableFrom(fieldType);
     }
 }
