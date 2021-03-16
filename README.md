@@ -11,6 +11,31 @@ Furthermore, validations **can be loaded to the cache eagerly** by providing pac
 scanned at initialization.
 
 ## Examples
+### Configuration
+``` java
+@Configuration
+public class BeanCfg {
+
+    @Bean
+    public ValidationRunner validationRunner() {
+        ValidationRunnerFactory factory = new ValidationRunnerFactory();
+        return factory.getValidationRunner();
+    }
+}
+```
+Or with eager loading of the types to be validated:
+``` java
+
+    @Bean
+    public ValidationRunner validationRunner() {
+        ValidationRunnerFactory factory = new ValidationRunnerFactory();
+        factory.setPackagesToScan("org.example.dto")
+        return factory.getValidationRunner();
+    }
+}
+
+```
+
 ### ValidationRunner
 Run validations through the `ValidationRunner` class. The result of the validation is returned in `ValidationResult` containing
 an immutable map which maps field names to error messages.
