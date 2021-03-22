@@ -28,19 +28,4 @@ class FieldValidation {
         if(!errors.isEmpty())
             res.addErrorList(field.getName(), errors);
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        FieldValidation that = (FieldValidation) o;
-
-        return this.field.equals(that.field) && this.annotation.equals(that.annotation);
-    }
-
-    @Override
-    public int hashCode() {
-        return field.hashCode();
-    }
 }
