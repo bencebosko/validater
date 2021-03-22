@@ -15,10 +15,7 @@ public final class MatchesValidator implements FieldValidator<String, Matches> {
 
     @Override
     public void validate(@Nullable String value, Matches annotation, List<ValidationError> errors) {
-        if(value == null) {
-            errors.add(new ValidationError("value is null"));
-        }
-        else if(!value.matches(annotation.regex()))
+        if(value != null && !value.matches(annotation.regex()))
             errors.add(new ValidationError(annotation.message()));
     }
 }

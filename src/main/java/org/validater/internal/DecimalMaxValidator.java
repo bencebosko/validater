@@ -15,10 +15,7 @@ public final class DecimalMaxValidator implements FieldValidator<Number, Decimal
 
     @Override
     public void validate(@Nullable Number value, DecimalMax annotation, List<ValidationError> errors) {
-        if(value == null) {
-            errors.add(new ValidationError("value is null"));
-        }
-        else if(value.doubleValue() > annotation.value())
+        if(value != null && value.doubleValue() > annotation.value())
             errors.add(new ValidationError(annotation.message()));
     }
 }

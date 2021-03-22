@@ -15,9 +15,7 @@ public final class MinValidator implements FieldValidator<Number, Min> {
 
     @Override
     public void validate(@Nullable Number value, Min annotation, List<ValidationError> errors) {
-        if(value == null)
-            errors.add(new ValidationError("value is null"));
-        else if (value.longValue() < annotation.value())
+        if (value != null && value.longValue() < annotation.value())
             errors.add(new ValidationError(annotation.message()));
     }
 }

@@ -71,7 +71,6 @@ public class FieldValidatorTest {
         }
 
         ValidationResult expected = new ValidationResult(new HashMap<String, List<ValidationError>>() {{
-            put("str1", Arrays.asList(new ValidationError("value is null")));
             put("str2", Arrays.asList(new ValidationError("not matches the pattern")));
         }});
 
@@ -130,9 +129,7 @@ public class FieldValidatorTest {
         }
 
         ValidationResult expected = new ValidationResult(new HashMap<String, List<ValidationError>>() {{
-            put("field1", Arrays.asList(new ValidationError("value is null")));
             put("field2", Arrays.asList(new ValidationError("value is greater than max")));
-            put("field4", Arrays.asList(new ValidationError("value is null")));
             put("field5", Arrays.asList(new ValidationError("value is less than min")));
         }});
 
@@ -166,9 +163,7 @@ public class FieldValidatorTest {
         }
 
         ValidationResult expected = new ValidationResult(new HashMap<String, List<ValidationError>>() {{
-            put("field1", Arrays.asList(new ValidationError("value is null")));
             put("field3", Arrays.asList(new ValidationError("value is greater than max")));
-            put("field4", Arrays.asList(new ValidationError("value is null")));
             put("field5", Arrays.asList(new ValidationError("value is less than min")));
         }});
 
@@ -207,21 +202,17 @@ public class FieldValidatorTest {
         class TestObject {
 
             @Required
-            @DecimalMax(64)
-            @DecimalMin(62)
+            @DecimalMax(60)
+            @DecimalMin(70)
+            @Min(80)
             double field1 = 62.44;
-
-            @Required
-            @DecimalMin(56)
-            @DecimalMax(77)
-            Double field2;
-
-            String field3 = "nothing";
 
         }
 
         ValidationResult expected = new ValidationResult(new HashMap<String, List<ValidationError>>() {{
-            put("field2", Arrays.asList(new ValidationError("field is required"), new ValidationError("value is null")));
+            put("field1", Arrays.asList(
+                    new ValidationError("value is greater than max"),
+                    new ValidationError("value is less than min")));
         }});
 
         ValidationResult result = validationRunner.validate(new TestObject());
