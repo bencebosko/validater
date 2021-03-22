@@ -62,12 +62,12 @@ public class ValidationRunner {
         return scanClassRec(cls, new ArrayList<>(), new HashSet<>());
     }
 
-    private List<FieldValidation> scanClassRec(Class<?> cls, List<FieldValidation> validations, Set<String> fieldNames) {
+    private List<FieldValidation> scanClassRec(Class<?> cls, List<FieldValidation> validations, Set<String> scannedNames) {
         if(cls == Object.class)
             return validations;
 
         for(Field field : cls.getDeclaredFields()) {
-            if(!isOverridden(field, fieldNames)) {
+            if(!isFieldHidden(field, scannedNames)) {
                 for (Annotation annotation : field.getDeclaredAnnotations()) {
                     Optional<Validation> validation =
                             Optional.ofNullable(AnnotationUtils.getAnnotation(annotation, Validation.class));
@@ -81,10 +81,10 @@ public class ValidationRunner {
                             validations.add(new FieldValidation(field, annotation, validator));
                     }
                 }
-                fieldNames.add(field.getName());
+                scannedNames.add(field.getName());
             }
         }
-        return scanClassRec(cls.getSuperclass(), validations, fieldNames);
+        return scanClassRec(cls.getSuperclass(), validations, scannedNames);
     }
 
     ValidationCache getCache() {
@@ -99,7 +99,7 @@ public class ValidationRunner {
         return validator.fieldType().isAssignableFrom(fieldType);
     }
 
-    private boolean isOverridden(Field field, Set<String> fieldNames) {
+    private boolean isFieldHidden(Field field, Set<String> fieldNames) {
         return fieldNames.contains(field.getName());
     }
 }
