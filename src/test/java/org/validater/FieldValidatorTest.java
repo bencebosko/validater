@@ -95,8 +95,8 @@ public class FieldValidatorTest {
         }
 
         ValidationResult expected = new ValidationResult(new HashMap<String, List<ValidationError>>() {{
-            put("field1", Arrays.asList(new ValidationError("field is required")));
-            put("field3", Arrays.asList(new ValidationError("field is required")));
+            put("field1", Arrays.asList(new ValidationError("field is null")));
+            put("field3", Arrays.asList(new ValidationError("field is null")));
         }});
 
         ValidationResult result = validationRunner.validate(new TestObject());

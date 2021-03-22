@@ -7,6 +7,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Validation for checking if a String matches a pattern. Null values are not validated.
+ * */
+
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 @Validation(validator = MatchesValidator.class)
