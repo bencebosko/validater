@@ -179,6 +179,29 @@ public class FieldValidatorTest {
     }
 
     @Test
+    public void testLength() {
+        class TestObject {
+            @Length(10)
+            String field1;
+
+            @Length(10)
+            String field2 = "not null";
+
+            @Length(2)
+            String field3 = "abc";
+        }
+
+        ValidationResult expected = new ValidationResult(new HashMap<String, List<ValidationError>>() {{
+            put("field3", Arrays.asList(new ValidationError("field exceeds length")));
+        }});
+
+        ValidationResult result = validationRunner.validate(new TestObject());
+
+        assertFalse(result.isValid());
+        assertEquals(expected, result);
+    }
+
+    @Test
     public void testMultiple() {
 
         class TestObject {
