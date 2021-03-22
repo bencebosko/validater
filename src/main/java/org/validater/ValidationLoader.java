@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 class ValidationLoader {
 
     private static final int INITIAL_SIZE = 32;
+
     private final Map<Class<? extends Validator>, Validator<Object>> validators;
     private final Map<Class<? extends FieldValidator>, FieldValidator<Object, Annotation>> fieldValidators;
 

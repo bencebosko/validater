@@ -26,12 +26,12 @@ public class ValidationRunner {
     }
 
     public ValidationResult validate(Object obj) {
-        Class<?> objType = obj.getClass();
-        if(validationCache.isCached(objType))
+        Class<?> type = obj.getClass();
+        if(validationCache.isCached(type))
             return validationCache.validate(obj);
 
         Optional<ValidatedBy> validation =
-                Optional.ofNullable(objType.getAnnotation(ValidatedBy.class));
+                Optional.ofNullable(type.getAnnotation(ValidatedBy.class));
 
         if(validation.isPresent()) {
             Validator<Object> validator = validationLoader.getValidator(validation.get().validator());
