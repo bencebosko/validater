@@ -17,7 +17,7 @@ public class ValidationRunnerFactory {
             for (String p : packagesToScan) {
                 Reflections reflections = new Reflections(p, new SubTypesScanner(false));
                 for (Class<?> cls : reflections.getSubTypesOf(Object.class)) {
-                    List<FieldValidation> validations = validationRunner.scanClassFields(cls);
+                    List<FieldValidation> validations = validationRunner.scanClass(cls);
                     cache.cacheForType(cls, validations);
                 }
             }

@@ -53,31 +53,38 @@ public class ValidationRunner {
 
     private ValidationResult validateAllField(Object obj) {
         Class<?> cls = obj.getClass();
-        List<FieldValidation> validations = scanClassFields(cls);
+        List<FieldValidation> validations = scanClass(cls);
         validationCache.cacheForType(cls, validations);
         return validationCache.validate(obj);
     }
 
-    List<FieldValidation> scanClassFields(Class<?> cls) {
+    List<FieldValidation> scanClass(Class<?> cls) {
+        return scanClassRec(cls, new ArrayList<>(), new HashSet<>());
+    }
 
-        List<FieldValidation> validations = new ArrayList<>();
+    private List<FieldValidation> scanClassRec(Class<?> cls, List<FieldValidation> validations, Set<String> fieldNames) {
+        if(cls == Object.class)
+            return validations;
 
         for(Field field : cls.getDeclaredFields()) {
-            for(Annotation annotation : field.getDeclaredAnnotations()) {
-                Optional<Validation> validation =
-                        Optional.ofNullable(AnnotationUtils.getAnnotation(annotation, Validation.class));
+            if(!isOverridden(field, fieldNames)) {
+                for (Annotation annotation : field.getDeclaredAnnotations()) {
+                    Optional<Validation> validation =
+                            Optional.ofNullable(AnnotationUtils.getAnnotation(annotation, Validation.class));
 
-                if(validation.isPresent()) {
-                    FieldValidator<Object, Annotation> validator =
-                            validationLoader.getFieldValidator(validation.get().validator());
-                    if(!isCompatible(field, validator))
-                        throw new FieldValidationException(cls, field);
-                    else
-                        validations.add(new FieldValidation(field, annotation, validator));
+                    if (validation.isPresent()) {
+                        FieldValidator<Object, Annotation> validator =
+                                validationLoader.getFieldValidator(validation.get().validator());
+                        if (!isCompatible(field, validator))
+                            throw new FieldValidationException(cls, field);
+                        else
+                            validations.add(new FieldValidation(field, annotation, validator));
+                    }
                 }
+                fieldNames.add(field.getName());
             }
         }
-        return validations;
+        return scanClassRec(cls.getSuperclass(), validations, fieldNames);
     }
 
     ValidationCache getCache() {
@@ -90,5 +97,9 @@ public class ValidationRunner {
             fieldType = PrimitiveMapper.getWrapper(fieldType);
         }
         return validator.fieldType().isAssignableFrom(fieldType);
+    }
+
+    private boolean isOverridden(Field field, Set<String> fieldNames) {
+        return fieldNames.contains(field.getName());
     }
 }

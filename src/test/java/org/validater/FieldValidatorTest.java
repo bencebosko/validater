@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.validater.annotations.*;
 import org.validater.exceptions.FieldValidationException;
 import org.validater.exceptions.ValidatorInstantiationException;
-
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -233,5 +232,33 @@ public class FieldValidatorTest {
         ClassCastException exception = assertThrows(ClassCastException.class, () -> {
             validationRunner.validate(new TestObject());
         });
+    }
+
+    @Test
+    public void testSuperClass() {
+
+        class TestObject {
+            @Max(10)
+            int field1 = 20;
+
+            @Min(40)
+            int field2 = 30;
+
+        }
+
+        class TestObjectSub extends TestObject {
+            @Min(50)
+            int field1 = 30;
+        }
+
+        ValidationResult expected = new ValidationResult(new HashMap<String, List<ValidationError>>() {{
+            put("field1", Arrays.asList(new ValidationError("value is less than min")));
+            put("field2", Arrays.asList(new ValidationError("value is less than min")));
+        }});
+
+        ValidationResult result = validationRunner.validate(new TestObjectSub());
+
+        assertFalse(result.isValid());
+        assertEquals(expected, result);
     }
 }
