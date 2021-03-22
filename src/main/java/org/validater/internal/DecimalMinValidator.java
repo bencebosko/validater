@@ -6,7 +6,7 @@ import org.validater.ValidationError;
 import org.validater.annotations.DecimalMin;
 import java.util.List;
 
-public class DecimalMinValidator implements FieldValidator<Number, DecimalMin> {
+public final class DecimalMinValidator implements FieldValidator<Number, DecimalMin> {
 
     @Override
     public Class<Number> fieldType() {

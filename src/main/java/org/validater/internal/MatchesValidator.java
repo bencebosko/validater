@@ -6,7 +6,7 @@ import org.validater.ValidationError;
 import org.validater.annotations.Matches;
 import java.util.List;
 
-public class MatchesValidator implements FieldValidator<String, Matches> {
+public final class MatchesValidator implements FieldValidator<String, Matches> {
 
     @Override
     public Class<String> fieldType() {

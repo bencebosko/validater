@@ -6,7 +6,7 @@ import org.validater.ValidationError;
 import org.validater.annotations.Min;
 import java.util.List;
 
-public class MinValidator implements FieldValidator<Number, Min> {
+public final class MinValidator implements FieldValidator<Number, Min> {
 
     @Override
     public Class<Number> fieldType() {

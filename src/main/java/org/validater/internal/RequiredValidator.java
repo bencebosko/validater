@@ -6,7 +6,7 @@ import org.validater.ValidationError;
 import org.validater.annotations.Required;
 import java.util.List;
 
-public class RequiredValidator implements FieldValidator<Object, Required> {
+public final class RequiredValidator implements FieldValidator<Object, Required> {
 
     @Override
     public Class<Object> fieldType() {

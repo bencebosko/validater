@@ -6,7 +6,7 @@ import org.validater.ValidationError;
 import org.validater.annotations.Max;
 import java.util.List;
 
-public class MaxValidator implements FieldValidator<Number, Max> {
+public final class MaxValidator implements FieldValidator<Number, Max> {
 
     @Override
     public Class<Number> fieldType() {

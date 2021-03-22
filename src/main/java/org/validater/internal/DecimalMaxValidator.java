@@ -6,7 +6,7 @@ import org.validater.annotations.DecimalMax;
 import org.validater.ValidationError;
 import java.util.List;
 
-public class DecimalMaxValidator implements FieldValidator<Number, DecimalMax> {
+public final class DecimalMaxValidator implements FieldValidator<Number, DecimalMax> {
 
     @Override
     public Class<Number> fieldType() {
