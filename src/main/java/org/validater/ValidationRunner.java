@@ -1,5 +1,6 @@
 package org.validater;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.validater.annotations.ValidatedBy;
 import org.validater.annotations.Validation;
@@ -27,8 +28,10 @@ public class ValidationRunner {
 
     public ValidationResult validate(Object obj) {
         Class<?> type = obj.getClass();
-        if(validationCache.isCached(type))
-            return validationCache.validate(obj);
+        if(validationCache.isCached(type)) {
+            List<FieldValidation> validations = validationCache.getValidations(type);
+            return validate(obj, validations);
+        }
 
         Optional<ValidatedBy> validation =
                 Optional.ofNullable(type.getAnnotation(ValidatedBy.class));
@@ -55,7 +58,7 @@ public class ValidationRunner {
         Class<?> cls = obj.getClass();
         List<FieldValidation> validations = scanClass(cls);
         validationCache.cacheForType(cls, validations);
-        return validationCache.validate(obj);
+        return validate(obj, validations);
     }
 
     List<FieldValidation> scanClass(Class<?> cls) {
@@ -85,6 +88,18 @@ public class ValidationRunner {
             }
         }
         return scanClassRec(cls.getSuperclass(), validations, scannedNames);
+    }
+
+    private ValidationResult validate(Object obj, List<FieldValidation> validations) {
+        ValidationResult res = new ValidationResult();
+        try {
+            for (FieldValidation v : validations) {
+                v.run(obj, res);
+            }
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
+            ex.printStackTrace();
+        }
+        return res;
     }
 
     ValidationCache getCache() {

@@ -1,5 +1,7 @@
 package org.validater;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,15 +23,12 @@ class ValidationCache {
         fieldValidations.put(type, Collections.unmodifiableList(validations));
     }
 
-    ValidationResult validate(Object obj) {
-        ValidationResult res = new ValidationResult();
-        try {
-            for (FieldValidation v : fieldValidations.get(obj.getClass())) {
-                v.run(obj, res);
-            }
-        } catch (IllegalArgumentException | IllegalAccessException ex) {
-            ex.printStackTrace();
-        }
-        return res;
+    @Nullable
+    List<FieldValidation> getValidations(Class<?> clss) {
+        return fieldValidations.get(clss);
+    }
+
+    void clear() {
+        fieldValidations.clear();
     }
 }
