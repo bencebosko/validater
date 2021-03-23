@@ -1,9 +1,9 @@
 
 package org.validater;
-import org.junit.jupiter.api.Disabled;
+
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.validater.annotations.Max;
-
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -16,11 +16,14 @@ public class FieldValidatorConcurrencyTest {
 
     private static ValidationRunner validationRunner;
 
-    @Test
-    public void testConcurrentCache() {
+    @BeforeAll
+    public static void init() {
         ValidationRunnerFactory factory = new ValidationRunnerFactory();
-
         validationRunner = factory.getValidationRunner();
+    }
+
+    @Test
+    public void testConcurrentCacheAccess() {
 
         class TestObject {
 
@@ -40,11 +43,39 @@ public class FieldValidatorConcurrencyTest {
             int field7 = 30;
         }
 
+        class TestObject2 extends TestObject {}
+        class TestObject3 extends TestObject {}
+        class TestObject4 extends TestObject {}
+        class TestObject5 extends TestObject {}
+
         class ValidationTask implements Callable<ValidationResult> {
+
+            private TestObject obj;
+
+            ValidationTask(TestObject obj) {
+                this.obj = obj;
+            }
 
             @Override
             public ValidationResult call() throws Exception {
-                return validationRunner.validate(new TestObject());
+                return validationRunner.validate(obj);
+            }
+        }
+
+        ExecutorService executor = Executors.newCachedThreadPool();
+        Random rand = new Random();
+        TestObject[] testObjects =
+                {new TestObject(), new TestObject2(), new TestObject3(), new TestObject4(), new TestObject5()};
+
+        List<Future<ValidationResult>> results = new ArrayList<>();
+
+        for(int i=0; i<100000; i++) {
+            int ind = rand.nextInt(5);
+            results.add(executor.submit(new ValidationTask(testObjects[ind])));
+
+            if(i % 10 == 1) {
+                ValidationCache cache = validationRunner.getCache();
+                cache.clear();
             }
         }
 
@@ -57,13 +88,6 @@ public class FieldValidatorConcurrencyTest {
             put("field6", Arrays.asList(new ValidationError("value is greater than max")));
             put("field7", Arrays.asList(new ValidationError("value is greater than max")));
         }});
-
-        ExecutorService executor = Executors.newCachedThreadPool();
-        List<Future<ValidationResult>> results = new ArrayList<>();
-
-        for(int i=0; i<10000; i++) {
-            results.add(executor.submit(new ValidationTask()));
-        }
 
         try {
             for (Future<ValidationResult> future : results)

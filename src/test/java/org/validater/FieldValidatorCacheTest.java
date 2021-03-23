@@ -1,7 +1,6 @@
 package org.validater;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.validater.annotations.Max;
 import org.validater.annotations.Min;
