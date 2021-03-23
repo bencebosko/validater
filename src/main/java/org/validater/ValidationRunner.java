@@ -1,6 +1,5 @@
 package org.validater;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.validater.annotations.ValidatedBy;
 import org.validater.annotations.Validation;
@@ -28,10 +27,9 @@ public class ValidationRunner {
 
     public ValidationResult validate(Object obj) {
         Class<?> type = obj.getClass();
-        if(validationCache.isCached(type)) {
-            List<FieldValidation> validations = validationCache.getValidations(type);
-            return validate(obj, validations);
-        }
+        Optional<List<FieldValidation>> validations = validationCache.getValidations(type);
+            if(validations.isPresent())
+                return validate(obj, validations.get());
 
         Optional<ValidatedBy> validation =
                 Optional.ofNullable(type.getAnnotation(ValidatedBy.class));
@@ -57,7 +55,7 @@ public class ValidationRunner {
     private ValidationResult validateAllField(Object obj) {
         Class<?> cls = obj.getClass();
         List<FieldValidation> validations = scanClass(cls);
-        validationCache.cacheForType(cls, validations);
+        validationCache.cacheValidations(cls, validations);
         return validate(obj, validations);
     }
 

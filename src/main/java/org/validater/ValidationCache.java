@@ -1,6 +1,5 @@
 package org.validater;
 
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,13 +18,12 @@ class ValidationCache {
         return fieldValidations.containsKey(type);
     }
 
-    void cacheForType(Class<?> type, List<FieldValidation> validations) {
+    void cacheValidations(Class<?> type, List<FieldValidation> validations) {
         fieldValidations.put(type, Collections.unmodifiableList(validations));
     }
 
-    @Nullable
-    List<FieldValidation> getValidations(Class<?> clss) {
-        return fieldValidations.get(clss);
+    Optional<List<FieldValidation>> getValidations(Class<?> clss) {
+        return Optional.ofNullable(fieldValidations.get(clss));
     }
 
     void clear() {
