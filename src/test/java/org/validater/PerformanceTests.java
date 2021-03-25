@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.validater.annotations.Max;
 import org.validater.annotations.Min;
 import org.validater.annotations.Required;
+import static java.lang.management.ManagementFactory.getThreadMXBean;
 
 @Disabled
 public class PerformanceTests {
@@ -27,21 +28,23 @@ public class PerformanceTests {
 
     @Test
     public void testCachePerformance() {
+        Thread t = new Thread(new ValidationTask(validationRunner, new TestObject(), "CacheValidation"));
+        t.start();
+        try {
+            t.join();
+        } catch (Exception ex) {
 
-        ValidationCache cache = validationRunner.getCache();
-
-        for(int i=0; i<100000; i++) {
-            validationRunner.validate(new TestObject());
         }
-
-        cache.clear();
     }
 
     @Test
     public void testNoCachePerformance() {
+        Thread t = new Thread(new ValidationTask(validationRunnerNoCache, new TestObject(), "NoCacheValidation"));
+        t.start();
+        try {
+            t.join();
+        } catch (Exception ex) {
 
-        for(int i=0; i<100000; i++) {
-            validationRunnerNoCache.validate(new TestObject());
         }
     }
 
@@ -67,5 +70,31 @@ public class PerformanceTests {
 
         @Max(120)
         int field7 = 100;
+    }
+
+    private static class ValidationTask implements Runnable {
+
+        ValidationRunner validationRunner;
+        TestObject obj;
+        String label;
+        long threadCpuTime;
+
+        ValidationTask(ValidationRunner runner, TestObject obj, String label) {
+            this.validationRunner = runner;
+            this.obj = obj;
+            this.label = label;
+        }
+
+        @Override
+        public void run() {
+            for(int i=0; i<100000; i++) {
+                validationRunner.validate(obj);
+            }
+            threadCpuTime = getThreadMXBean().getThreadCpuTime(Thread.currentThread().getId());
+
+            System.out.println(label+ " ran in: " + (threadCpuTime / 1000000L) + " ms");
+
+            validationRunner.getCache().clear();
+        }
     }
 }
