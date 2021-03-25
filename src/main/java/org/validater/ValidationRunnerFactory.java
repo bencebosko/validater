@@ -10,7 +10,7 @@ public class ValidationRunnerFactory {
 
     public ValidationRunner getValidationRunner() {
 
-        ValidationRunner validationRunner = new ValidationRunner();
+        ValidationRunner validationRunner = new ValidationRunner(new ValidationCacheImpl());
         ValidationCache cache = validationRunner.getCache();
 
         if(packagesToScan != null) {

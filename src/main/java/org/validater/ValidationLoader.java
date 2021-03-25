@@ -5,6 +5,7 @@ import org.validater.exceptions.ValidatorInstantiationException;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * The class which loads and stores validator instances.
@@ -14,8 +15,8 @@ class ValidationLoader {
 
     private static final int INITIAL_SIZE = 32;
 
-    private final Map<Class<? extends Validator>, Validator<Object>> validators;
-    private final Map<Class<? extends FieldValidator>, FieldValidator<Object, Annotation>> fieldValidators;
+    private final ConcurrentMap<Class<? extends Validator>, Validator<Object>> validators;
+    private final ConcurrentMap<Class<? extends FieldValidator>, FieldValidator<Object, Annotation>> fieldValidators;
 
     ValidationLoader() {
         validators = new ConcurrentHashMap<>(INITIAL_SIZE);

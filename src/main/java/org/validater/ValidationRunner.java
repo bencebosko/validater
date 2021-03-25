@@ -20,16 +20,17 @@ public class ValidationRunner {
     private final ValidationLoader validationLoader;
     private final ValidationCache validationCache;
 
-    ValidationRunner() {
+    ValidationRunner(ValidationCache cache) {
         validationLoader = new ValidationLoader();
-        validationCache = new ValidationCache();
+        validationCache = cache;
     }
 
     public ValidationResult validate(Object obj) {
         Class<?> type = obj.getClass();
-        Optional<List<FieldValidation>> validations = validationCache.getValidations(type);
-            if(validations.isPresent())
-                return validate(obj, validations.get());
+        if(validationCache.isCached(type)) {
+            List<FieldValidation> validations = validationCache.getValidations(type);
+            return validate(obj, validations);
+        }
 
         Optional<ValidatedBy> validation =
                 Optional.ofNullable(type.getAnnotation(ValidatedBy.class));
